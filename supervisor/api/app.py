@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import version_router
 from routers import hello_v1, hello_v2
 
 def create_app()->FastAPI:
@@ -12,7 +13,3 @@ def create_app()->FastAPI:
     return app
 
 app = create_app()
-
-@app.get("/")
-async def root():
-    return {"message": "Hello Bigger Applications!"}
