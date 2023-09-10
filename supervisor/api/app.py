@@ -1,15 +1,13 @@
 from fastapi import FastAPI
-import version_router
-from routers import hello_v1, hello_v2
+from routers.v1 import ROUTERS as v1_routes
 
 def create_app()->FastAPI:
     app = FastAPI()
 
-    app.include_router(hello_v1.router, prefix="/v1")
-    app.include_router(hello_v2.router)
-    app.include_router(hello_v2.router, prefix="/v2")
-    app.include_router(hello_v2.router, prefix="/latest")
-
+    for route in v1_routes:
+        app.include_router(route, prefix="/v1")
+        app.include_router(route, prefix="")
+        app.include_router(route, prefix="/latest")
     return app
 
 app = create_app()
