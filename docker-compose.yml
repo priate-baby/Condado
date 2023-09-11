@@ -10,17 +10,24 @@ services:
       - "8000:8000"
     volumes:
       - ./supervisor/api:/app
-    #depends_on:
-    #  - condado_supervisor_db
+    depends_on:
+      - condado_supervisor_db
     command: uvicorn app:app --reload --host 0.0.0.0 --port 8000
-  #condado_supervisor_db:
-  #  image: mongo:latest
-  #  volumes:
-  #    - ./supervisor/db:/data/db
-  #  restart: always
-  #  environment:
-  #    MONGO_INITDB_ROOT_USERNAME: condado
-  #    MONGO_INITDB_ROOT_PASSWORD: condado
+    environment:
+      MONGO_HOST: condado_supervisor_db
+      MONGO_PORT: 27017
+      MONGO_DB: condado
+      MONGO_USER: condado
+      MONGO_PASSWORD: condado
+  condado_supervisor_db:
+    image: mongo:latest
+    volumes:
+      - ./supervisor/db:/data/db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: condado
+      MONGO_INITDB_ROOT_PASSWORD: condado
+      MONGO_INITDB_DATABASE: condado
   condado_spa:
     image: condado_spa:latest
     build:
@@ -31,4 +38,3 @@ services:
     command: npm run dev -- --host
     ports:
       - "5143:5143"
-      - "3000:3000"
