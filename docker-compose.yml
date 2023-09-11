@@ -1,13 +1,22 @@
 version: "3.7"
 services:
+  # nginx
+  condado_webserver:
+    image: nginx:1.25.2
+    volumes:
+      - ./nginx:/etc/nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - condado_spa
+      - condado_supervisor_api
+  # api
   condado_supervisor_api:
     image: condado_supervisor_api:latest
     build:
       context: .
       dockerfile: Dockerfile
       target: supervisor_api
-    ports:
-      - "8000:8000"
     volumes:
       - ./supervisor/api:/app
       - ./settings.yml:/app/settings.yml
@@ -20,6 +29,7 @@ services:
       MONGO_DB: condado
       MONGO_USER: condado
       MONGO_PASSWORD: condado
+  # mongo db
   condado_supervisor_db:
     image: mongo:latest
     volumes:
@@ -29,6 +39,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: condado
       MONGO_INITDB_ROOT_PASSWORD: condado
       MONGO_INITDB_DATABASE: condado
+  # vue
   condado_spa:
     image: condado_spa:latest
     build:
@@ -37,5 +48,6 @@ services:
     volumes:
       - ./spa:/app
     command: npm run dev -- --host
-    ports:
-      - "5143:5143"
+networks:
+  default:
+    name: condado
