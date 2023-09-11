@@ -10,6 +10,7 @@ services:
       - "8000:8000"
     volumes:
       - ./supervisor/api:/app
+      - ./settings.yml:/app/settings.yml
     depends_on:
       - condado_supervisor_db
     command: uvicorn app:app --reload --host 0.0.0.0 --port 8000

@@ -1,4 +1,4 @@
-from .tenent import Tenent
+from .tenent import InTenent, Tenent
 
 
 DOCUMENT_MODELS = [Tenent]

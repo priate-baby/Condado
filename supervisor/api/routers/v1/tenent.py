@@ -1,12 +1,17 @@
-from fastapi import APIRouter
-from models import Tenent
+from pymongo import errors
+from fastapi import APIRouter, HTTPException
+from models import InTenent, Tenent
 
 router = APIRouter()
 
 @router.post("/tenent")
-async def create_tenent(tenent: Tenent):
+async def create_tenent(tenent: InTenent):
     """Create a new tenent"""
-    await tenent.create()
+    try:
+        tenent = Tenent(**tenent.dict())
+        await tenent.create()
+    except errors.DuplicateKeyError as e:
+        raise HTTPException(status_code=409, detail="Tenent with that name already exists")
     return tenent
 
 @router.get("/tenent/{tenent_id}")
