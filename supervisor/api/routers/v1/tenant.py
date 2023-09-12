@@ -1,11 +1,11 @@
 from pymongo import errors
 from fastapi import APIRouter, HTTPException
-from models import Intenant, tenant
+from models import InTenant, tenant
 
 router = APIRouter()
 
 @router.post("/tenant")
-async def create_tenant(tenant: Intenant):
+async def create_tenant(tenant: InTenant):
     """Create a new tenant"""
     try:
         tenant = tenant(**tenant.dict())

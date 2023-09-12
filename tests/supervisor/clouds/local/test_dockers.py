@@ -1,7 +1,7 @@
 import pytest
 import docker
 from clouds.local import LocalCloud
-from models import Intenant
+from models import InTenant
 
 class TestDockers:
 
@@ -11,9 +11,9 @@ class TestDockers:
         with pytest.raises(docker.errors.ImageNotFound):
             client.images.get("condado_test_dockers_api")
         try:
-            tenant = Intenant(name="test dockers", cloud="aws")
+            tenant = InTenant(name="test dockers", cloud="aws")
             cloud = LocalCloud()
-            image = cloud.create_tenant_api_image(tenant)
+            image = cloud.create_api_image(tenant)
 
             assert image in client.images.list()
         finally:

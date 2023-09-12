@@ -7,6 +7,10 @@ class Environment(str, Enum):
     DEV = 'dev'
     PROD = 'prod'
 
+class DbPlatform(str, Enum):
+    MONGO = 'mongo'
+    POSTGRES = 'postgres'
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='/.condado/settings.env',
@@ -16,5 +20,6 @@ class Settings(BaseSettings):
 
     environment: Environment = Field()
     domain: str = Field()
+    tenant_db_platform: DbPlatform = Field()
 
 SETTINGS = Settings()

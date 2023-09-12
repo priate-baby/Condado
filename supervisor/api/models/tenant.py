@@ -11,7 +11,7 @@ class Cloud(str, Enum):
     gcp = "gcp"
     akamai = "akamai"
 
-class Intenant(BaseModel):
+class InTenant(BaseModel):
     name: constr(strip_whitespace=True, pattern=r"^[\a-zA-Z0-9\s]*$")
     cloud: Cloud
 
@@ -19,7 +19,7 @@ class Intenant(BaseModel):
     def url_name(self) -> str:
         return self.name.lower().replace(" ", "-")
 
-class tenant(Intenant, Document):
+class tenant(InTenant, Document):
 
     class Settings:
         use_revision = True
