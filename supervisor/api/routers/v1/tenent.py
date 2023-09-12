@@ -1,29 +1,29 @@
 from pymongo import errors
 from fastapi import APIRouter, HTTPException
-from models import InTenent, Tenent
+from models import Intenant, tenant
 
 router = APIRouter()
 
-@router.post("/tenent")
-async def create_tenent(tenent: InTenent):
-    """Create a new tenent"""
+@router.post("/tenant")
+async def create_tenant(tenant: Intenant):
+    """Create a new tenant"""
     try:
-        tenent = Tenent(**tenent.dict())
-        await tenent.create()
+        tenant = tenant(**tenant.dict())
+        await tenant.create()
     except errors.DuplicateKeyError as e:
-        raise HTTPException(status_code=409, detail="Tenent with that name already exists")
-    return tenent
+        raise HTTPException(status_code=409, detail="tenant with that name already exists")
+    return tenant
 
-@router.get("/tenent/{tenent_id}")
-async def get_tenent(tenent_id: str):
-    """Get a tenent by ID"""
-    found = await Tenent.get(tenent_id)
+@router.get("/tenant/{tenant_id}")
+async def get_tenant(tenant_id: str):
+    """Get a tenant by ID"""
+    found = await tenant.get(tenant_id)
     if not found:
-        return {"error": "Tenent not found"}
+        return {"error": "tenant not found"}
     return found
 
-@router.get("/tenents")
-async def tenents_index():
-    """List all tenents"""
-    tenents = await Tenent.find_all().to_list()
-    return tenents
+@router.get("/tenants")
+async def tenants_index():
+    """List all tenants"""
+    tenants = await tenant.find_all().to_list()
+    return tenants

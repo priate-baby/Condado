@@ -1,4 +1,4 @@
-from .tenent import InTenent, Tenent
+from .tenant import Intenant, tenant
 
 
-DOCUMENT_MODELS = [Tenent]
+DOCUMENT_MODELS = [tenant]

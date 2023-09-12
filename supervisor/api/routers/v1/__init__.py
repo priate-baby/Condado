@@ -1,7 +1,7 @@
 from . import healthcheck
-from . import tenent
+from . import tenant
 
 ROUTERS = [
     healthcheck.router,
-    tenent.router,
+    tenant.router,
 ]

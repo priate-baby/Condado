@@ -5,7 +5,7 @@ description = "Single tenency web application framework"
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
-keywords = ["fastAPI", "view.js", "tenent", "framework"]
+keywords = ["fastAPI", "view.js", "tenant", "framework"]
 authors = [
   {name = "Ethan Knox", email = "ethan@pirate.baby" }
 ]

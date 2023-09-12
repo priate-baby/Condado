@@ -1,14 +1,16 @@
 from typing import TYPE_CHECKING
-from io import StringIO
 import docker
 
+# polyfill for docker-py path bug https://github.com/docker/docker-py/issues/2105
+docker.api.build.process_dockerfile = lambda dockerfile, path: ('Dockerfile', dockerfile)
+
 if TYPE_CHECKING:
-    from supervisor.api.models import Tenent
+    from supervisor.api.models import tenant
 # manage the local cloud
 
-# for each tenent
-# create the new tenent docker containers and start them
-# update the nginx config to have that tenent
+# for each tenant
+# create the new tenant docker containers and start them
+# update the nginx config to have that tenant
 # restart nginx
 
 class LocalCloud:
@@ -16,26 +18,26 @@ class LocalCloud:
 
     def __init__(self):
         self.docker_client = docker.from_env()
-        self.context = "/tenents/deafault" # TODO make this programmatic
+        self.context = "/tenants/default" # TODO make this programmatic
 
-    def create_tenent_api_image(self, tenent: "Tenent") -> docker.models.images.Image:
-        """Build a docker image for the tenent api"""
+    def create_tenant_api_image(self, tenant: "tenant") -> docker.models.images.Image:
+        """Build a docker image for the tenant api"""
 
         dockerfile_guts = f"""
         FROM python:3.11
         WORKDIR /app
-        COPY requirements.txt requirements.txt
+        COPY requirements.txt /app/requirements.txt
         RUN pip install -r requirements.txt
-        RUN uvicorn main:app --host
         """
-        image_name = f"condado_{tenent.domain}_api"
-        return self.docker_client.images.build(
+        image_name = f"condado_{tenant.url_name}_api"
+        image, _ = self.docker_client.images.build(
             path=self.context,
-            fileobj=StringIO(dockerfile_guts),
+            dockerfile=dockerfile_guts,
             tag=image_name,
             pull=True,
         )
+        return image
 
-    def create_tenent_containers(self, tenent):
-        # create the docker containers for the tenent
+    def create_tenant_containers(self, tenant):
+        # create the docker containers for the tenant
         pass
