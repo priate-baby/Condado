@@ -2,4 +2,8 @@ fastapi~=0.103.1
 uvicorn~=0.23.2
 beanie~=1.21.0
 docker~=5.0.2
-pyYAML~=6.0.1
+pydantic-settings~=2.0.3
+
+
+# tests TODO move these out
+pytest~=7.4.2

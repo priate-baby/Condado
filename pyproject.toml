@@ -1,0 +1,64 @@
+[Condado]
+name = "condado"
+version = "1.0.0"
+description = "Single tenency web application framework"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = ["fastAPI", "view.js", "tenent", "framework"]
+authors = [
+  {name = "Ethan Knox", email = "ethan@pirate.baby" }
+]
+maintainers = [
+  {name = "Ethan Knox", email = "ethan@pirate.baby" }
+]
+
+classifiers = [
+  "Framework :: FastAPI",
+  "License :: OSI Approved :: MIT License",
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Topic :: Internet :: WWW/HTTP",
+  "Programming Language :: JavaScript",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3 :: Only",
+]
+
+dependencies = [
+  # click
+  # docker
+]
+
+[project.optional-dependencies]
+#   $ pip install condado[dev]
+dev = ["check-manifest"]
+test = ["coverage"]
+
+[project.urls]
+"Homepage" = "https://github.com/piratebaby/condado"
+"Bug Reports" = "https://github.com/piratebaby/condado/issues"
+"Funding" = "https://donate.pypi.org"
+"Source" = "https://github.com/piratebaby/condado"
+
+# The following would provide a command line executable called `sample`
+# which executes the function `main` from this package when invoked.
+[project.scripts]  # Optional
+sample = "sample:main"
+
+# This is configuration specific to the `setuptools` build backend.
+# If you are using a different build backend, you will need to change this.
+[tool.setuptools]
+# If there are data files included in your packages that need to be
+# installed, specify them here.
+package-data = {"sample" = ["*.dat"]}
+
+[build-system]
+# These are the assumed default build requirements from pip:
+# https://pip.pypa.io/en/stable/reference/pip/#pep-517-and-518-support
+requires = ["setuptools>=43.0.0", "wheel"]
+build-backend = "setuptools.build_meta"

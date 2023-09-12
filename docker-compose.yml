@@ -18,8 +18,10 @@ services:
       dockerfile: Dockerfile
       target: supervisor_api
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - ./supervisor/api:/app
-      - ./settings.yml:/app/settings.yml
+      - ./settings.env:/.condado/settings.env
+      - ./tenents:/tenents
     depends_on:
       - condado_supervisor_db
     command: uvicorn app:app --reload --host 0.0.0.0 --port 8000
