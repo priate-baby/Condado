@@ -19,7 +19,7 @@ class InTenant(BaseModel):
     def url_name(self) -> str:
         return self.name.lower().replace(" ", "-")
 
-class tenant(InTenant, Document):
+class Tenant(InTenant, Document):
 
     class Settings:
         use_revision = True

@@ -1,6 +1,6 @@
 from pymongo import errors
 from fastapi import APIRouter, HTTPException
-from models import InTenant, tenant
+from models import InTenant, Tenant
 
 router = APIRouter()
 
@@ -8,7 +8,7 @@ router = APIRouter()
 async def create_tenant(tenant: InTenant):
     """Create a new tenant"""
     try:
-        tenant = tenant(**tenant.dict())
+        tenant = Tenant(**tenant.dict())
         await tenant.create()
     except errors.DuplicateKeyError as e:
         raise HTTPException(status_code=409, detail="tenant with that name already exists")
@@ -17,7 +17,7 @@ async def create_tenant(tenant: InTenant):
 @router.get("/tenant/{tenant_id}")
 async def get_tenant(tenant_id: str):
     """Get a tenant by ID"""
-    found = await tenant.get(tenant_id)
+    found = await Tenant.get(tenant_id)
     if not found:
         return {"error": "tenant not found"}
     return found
@@ -25,5 +25,5 @@ async def get_tenant(tenant_id: str):
 @router.get("/tenants")
 async def tenants_index():
     """List all tenants"""
-    tenants = await tenant.find_all().to_list()
+    tenants = await Tenant.find_all().to_list()
     return tenants
