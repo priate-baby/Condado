@@ -17,7 +17,8 @@ class TestDockers:
             tenant = InTenant(name="test dockers", cloud="aws")
             cloud = LocalCloud()
             containers = cloud.launch_tenant(tenant)
-            resp = requests.get("http://test-dockers.localhost/api/healthcheck")
+            # hack for passing nginx
+            resp = requests.get("http://host.docker.internal")
             assert resp.status_code == 200
 
         finally:

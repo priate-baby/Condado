@@ -4,6 +4,9 @@ beanie~=1.21.0
 docker~=6.1.3
 pydantic-settings~=2.0.3
 
+# local TODO move these out
+crossplane~=0.5.8 # for local nginx configuration
+
 
 # tests TODO move these out
 pytest~=7.4.2
