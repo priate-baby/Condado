@@ -27,7 +27,7 @@ class Tenant(InTenant, Document):
     @computed_field
     @property
     def url(self) -> HttpUrl:
-        return f"https://{self.url_name}.{SETTINGS['domain']}"
+        return f"https://{self.url_name}.{SETTINGS.domain}"
 
     class Settings:
         indexes = [

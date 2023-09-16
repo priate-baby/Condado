@@ -5,6 +5,10 @@ import crossplane
 if TYPE_CHECKING:
     from models import Tenant, InTenant
 
+class TooManyValues(Exception):
+    pass
+
+
 class NginxConfig:
     """helper for modifying the nginx config file"""
 
@@ -28,6 +32,33 @@ class NginxConfig:
                 d["block"].insert(0,
                     self._build_tenant_service_dict(tenant))
         return crossplane.build(self.config)
+
+    def remove_tenant(self, tenant: "Tenant | InTenant")-> str:
+        """Remove a tenant from the nginx config
+        Returns:
+            the string representation of the new nginx config file contents
+        """
+        for d in self.config:
+            if d["directive"] == "http":
+                server_blocks = d["block"]
+        for server in server_blocks:
+            if self._is_target_tenant(server, tenant):
+                server_blocks.remove(server)
+        return crossplane.build(self.config)
+
+    def _is_target_tenant(self,
+                          server: dict,
+                          tenant: "Tenant | InTenant") -> bool:
+        """check against the block server name
+        to determine if this is the tenant we want
+        Args:
+            - server: the server directive derived from a crossplane server component
+            - tenant: the tenant to check against
+        """
+        for d in server.get("block", []):
+            if d["directive"] == "server_name":
+                return d.get("args", None) == [f'{tenant.url_name}.localhost']
+        return False
 
     def _build_tenant_service_dict(self, tenant:"Tenant | InTenant") -> dict:
         """build a crossplane-compatable service dict"""

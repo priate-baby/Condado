@@ -59,7 +59,14 @@ class LocalCloud:
         self.launch_containers(
             self.get_container_configs(tenant)
         )
-        self.update_nginx(tenant)
+        self.nginx_add(tenant)
+
+    def drop_tenant(self, tenant: "Tenant") -> None:
+        """Bring down an existing tenant"""
+        self.nginx_remove(tenant)
+        configs = self.get_container_configs(tenant)
+        self.tear_down_containers(configs)
+        self.tear_down_images(configs)
 
     def get_container_configs(self, tenant: "Tenant") -> list[ContainerConfig]:
         """Get the container configs for a tenant"""
@@ -132,17 +139,47 @@ class LocalCloud:
                     append_new_container(container, container_set)
         return container_set
 
-    def update_nginx(self, tenant: "Tenant")-> None:
-        """Update the nginx config"""
+    def tear_down_containers(self, containers:list[ContainerConfig])-> None:
+        """Remove the tenant containers"""
+        for container in containers:
+            try:
+                self.docker_client.containers.get(container.formatted_name).remove(force=True)
+            except DockerTypes.api_error as e:
+                if "No such container" in e.explanation:
+                    logger.warning("No container named %s found, skipping removal",
+                                   container.formatted_name)
+                else:
+                    raise e
+    def tear_down_images(self, containers:list[ContainerConfig])-> None:
+        """Remove the tenant images"""
+        for container in containers:
+            try:
+                self.docker_client.images.remove(container.formatted_name, force=True)
+            except DockerTypes.api_error as e:
+                if "No such image" in e.explanation:
+                    logger.warning("No image named %s found, skipping removal",
+                                   container.formatted_name)
+                else:
+                    raise e
+
+    def nginx_add(self, tenant: "Tenant")-> None:
+        self._update_nginx(tenant, "add")
+
+    def nginx_remove(self, tenant: "Tenant")-> None:
+        self._update_nginx(tenant, "remove")
+
+    def _update_nginx(self,
+                      tenant: "Tenant",
+                      direction:Literal["add","remove"])-> None:
+        """Update the nginx config and restart nginx"""
+
         def nginx_path(file:str)->str:
             return f"/etc/nginx/{file}"
-
-        logger.info("Updating nginx config to add new tenant %s", tenant.name)
         nginx_container = self.docker_client.containers.get("condado-condado_webserver-1") # TODO make this programmatic
-
         # copy the nginx config from the container and update
         config_as_string = nginx_container.cp_out(nginx_path("nginx.conf"))
-        new_config = NginxConfig(config_as_string).add_tenant(tenant)
+        nginx_config = NginxConfig(config_as_string)
+        new_config = getattr(nginx_config,f"{direction}_tenant")(tenant)
 
         # write the new config to nginx
         nginx_container.cp_in(nginx_path("nginx.conf"), new_config)

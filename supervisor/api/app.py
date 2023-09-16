@@ -12,8 +12,8 @@ def create_app()->FastAPI:
     # add routers
     for route in v1_routes:
         app.include_router(route, prefix="/v1")
-        app.include_router(route, prefix="")
-        app.include_router(route, prefix="/latest")
+        app.include_router(route, prefix="", include_in_schema=False)
+        app.include_router(route, prefix="/latest", include_in_schema=False)
     return app
 
 app = create_app()
