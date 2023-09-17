@@ -1,4 +1,5 @@
 from typing import Literal
+from pathlib import Path
 import logging
 from pydantic import BaseModel, ConfigDict
 
@@ -10,6 +11,7 @@ from settings import SETTINGS
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
 
 class ContainerConfig(BaseModel):
     """Config for a container"""
@@ -32,7 +34,7 @@ class ContainerConfig(BaseModel):
                         self.suffix)
             try:
                 self.image, _ = docker_client.images.build(
-                    path="/tenants/default", # TODO make this programmatic
+                    path="/tenants",
                     dockerfile=self.dockerfile_guts,
                     tag=self.formatted_name,
                     pull=True,
@@ -46,6 +48,8 @@ class ContainerConfig(BaseModel):
     def formatted_name(self) -> str:
         """get the standardized name for the image and container"""
         return self.name_format.format(tenant=self.tenant.url_name, suffix=self.suffix)
+
+
 
 
 class LocalCloud:
@@ -70,6 +74,14 @@ class LocalCloud:
 
     def get_container_configs(self, tenant: "Tenant") -> list[ContainerConfig]:
         """Get the container configs for a tenant"""
+        # API tenant needs volumes and tenant-specific code
+        for file in Path("/tenants").iterdir():
+            if file.is_dir():
+                if file.name == tenant.url_name:
+                # TODO: add the tenant-specific code to the dockerfile_guts and the volumes
+                    pass
+
+
         return [
             ContainerConfig(
                 tenant=tenant,
