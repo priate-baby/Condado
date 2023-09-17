@@ -23,6 +23,7 @@ class ContainerConfig(BaseModel):
     suffix: Literal["db", "api"]
     dockerfile_guts: str
     environment: dict = {}
+    volumes: dict = {}
     image: DockerTypes.image | None = None
 
     def __init__(self, **kwargs):
@@ -75,13 +76,21 @@ class LocalCloud:
     def get_container_configs(self, tenant: "Tenant") -> list[ContainerConfig]:
         """Get the container configs for a tenant"""
         # API tenant needs volumes and tenant-specific code
+        custom_mounts = {}
+        volumes = {"/tenants/default":"/app"}
+
         for file in Path("/tenants").iterdir():
-            if file.is_dir():
-                if file.name == tenant.url_name:
-                # TODO: add the tenant-specific code to the dockerfile_guts and the volumes
-                    pass
-
-
+            if file.is_dir() and file.name == tenant.url_name:
+                additional_mounts = set(file.rglob("*"))
+        for file in [f for f in additional_mounts if not f.is_dir()]:
+            host_path = str(file.absolute())
+            host_root = str(Path("/tenants") / tenant.url_name)
+            container_root = str(Path("/app"))
+            container_path = host_path.replace(host_root, container_root)
+            custom_mounts[host_path] = container_path
+        volumes.update(custom_mounts)
+        custom_copy_statement = "\n".join([f"COPY {key} {value}" for key, value in custom_mounts.items()])
+        raise ValueError(custom_copy_statement)
         return [
             ContainerConfig(
                 tenant=tenant,
@@ -95,11 +104,13 @@ class LocalCloud:
                 FROM python:3.11
                 WORKDIR /app
                 COPY . /app
+                {custom_copy_statement}
                 COPY requirements.txt /app/requirements.txt
                 RUN pip install -r requirements.txt
                 """,
                 environment=self._get_db_configs(tenant)["environment"],
                 command="uvicorn app:app --reload --host 0.0.0.0 --port 8000",
+                volumes=volumes,
             )
         ]
 
@@ -138,6 +149,7 @@ class LocalCloud:
                 environment=container.environment,
                 network=container.networks[0],
                 command=container.command,
+                volumes={k:{'bind':v, 'mode':'rw'} for k,v in container.volumes.items()},
             ))
 
         for container in containers:
